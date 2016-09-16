@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>MY APP</title>
+</head>
+<body>
+
+	<input type="text" placeholder="name" id="name">
+	<input type="text" placeholder="message" id="message">
+	<button type="submit" onclick="messageServer();">Add To Database</button>
+	<button type="submit" onclick="getData();">Get Data</button>
+	<ul id="console"></ul>
+  <script src="ws_events_dispatcher.js"></script>
+  <script>
+	ws = new WebSocket("ws://localhost:8080");
+	socket = new FancyWebSocket(ws);
+	socket.bind("database",function(msg){
+		console.log(msg);
+		printDatabase(msg);
+	})
+	
+	function getData(){
+		socket.send("database_get",{});
+	}
+	
+	function messageServer(){
+		socket.send("database_add",{name:document.getElementById("name").value,message:document.getElementById("message").value});
+		socket.send("database_get",{});
+	}
+	
+	function printDatabase(db){
+		for (i=0;i<db.length;i++){
+			log(db[i].name + " says: " + db[i].message);
+		}
+	}
+	
+	function log(string) {
+	  var ul = document.getElementById("console");
+	  var li = document.createElement("li");
+
+	  li.appendChild(document.createTextNode(string));
+
+	  ul.appendChild(li);
+	  
+	}
+  </script>
+</body>
+</html>
